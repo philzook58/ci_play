@@ -47,27 +47,27 @@ jobs:
     - name: Create Z3 Build Directory
       run: mkdir vampire/z3/build
     - name: what is going ong
-      run: pwd
+      run: echo ${{runner.workspace}}/ci_play/vampire/z3/build
     - name: Configure Z3 Build
-      working-directory: ${{runner.workspace}}/vampire/z3/build
+      working-directory: ${{runner.workspace}}/ci_play/vampire/z3/build
       run: cmake .. -DCMAKE_BUILD_TYPE=Debug -DZ3_BUILD_EXECUTABLE=OFF -DZ3_BUILD_TEST_EXECUTABLES=OFF
       env:
         CXX: clang++
     - name: Z3 Build
-      working-directory: ${{runner.workspace}}/vampire/z3/build
+      working-directory: ${{runner.workspace}}/ci_play/vampire/z3/build
       run: make -j8
     - name: Create Build Directory
       run: mkdir build
     - name: Configure Build
-      working-directory: ${{runner.workspace}}/vampire/build
+      working-directory: ${{runner.workspace}}/ci_play/vampire/build
       run: cmake .. -DCMAKE_BUILD_TYPE=Release
       env:
         CXX: clang++
     - name: Build
-      working-directory: ${{runner.workspace}}/vampire/build
+      working-directory: ${{runner.workspace}}/ci_play/vampire/build
       run: make -j8
     - name: Run Unit Tests
-      working-directory: ${{runner.workspace}}/vampire/build
+      working-directory: ${{runner.workspace}}/ci_play/vampire/build
       run: ctest --output-on-failure
     - name: Run Sanity Checks
       run: checks/sanity build/vampire
@@ -75,7 +75,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: vampire
-        path: vampire/build/vampire # Change to the actual output binary
+        path: ci_play/vampire/build/vampire # Change to the actual output binary
 
   release:
     needs: 
