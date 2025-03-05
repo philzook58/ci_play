@@ -1,0 +1,64 @@
+name: Build and Release Binary
+
+on:
+  #push:
+  #  branches:
+  #    - main  # Change to your main development branch
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Change OS as needed
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake  # Add any required dependencies
+
+      - name: Pull external source (optional)
+        run: |
+          git clone https://github.com/eprover/eprover.gi
+
+      - name: Build project
+        run: |
+          cd eprover
+          ./configure --enable-ho
+          make
+
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: eprover
+          path: eprover/PROVER/eprover-ho  # Change to the actual output binary
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required to push a release
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download built artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: eprover
+          path: release
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: "Release v1.0.${{ github.run_number }}"
+          draft: false
+          prerelease: false
+          files: release/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
