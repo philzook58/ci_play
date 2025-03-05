@@ -21,7 +21,7 @@ jobs:
 
       - name: Pull external source (optional)
         run: |
-          git clone https://github.com/eprover/eprover.gi
+          git clone https://github.com/eprover/eprover.git
 
       - name: Build project
         run: |
