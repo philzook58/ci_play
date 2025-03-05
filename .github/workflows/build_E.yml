@@ -44,8 +44,6 @@ jobs:
         submodules: true
         repository: vprover/vampire
         path : vampire
-    - name: Check Copyright Headers
-      run: checks/headers
     - name: Create Z3 Build Directory
       run: mkdir vampire/z3/build
     - name: Configure Z3 Build
