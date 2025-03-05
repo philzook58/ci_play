@@ -11,8 +11,6 @@ jobs:
     runs-on: ubuntu-latest  # Change OS as needed
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
@@ -29,15 +27,59 @@ jobs:
           ./configure --enable-ho
           make
 
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: eprover
           path: eprover/PROVER/eprover-ho  # Change to the actual output binary
 
+          
+  build-vampire:
+    # https://github.com/vprover/vampire/blob/master/.github/workflows/CI.yml
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout Tree
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+        repository: vprover/vampire
+    - name: Check Copyright Headers
+      run: checks/headers
+    - name: Create Z3 Build Directory
+      run: mkdir z3/build
+    - name: Configure Z3 Build
+      working-directory: ${{runner.workspace}}/vampire/z3/build
+      run: cmake .. -DCMAKE_BUILD_TYPE=Debug -DZ3_BUILD_EXECUTABLE=OFF -DZ3_BUILD_TEST_EXECUTABLES=OFF
+      env:
+        CXX: clang++
+    - name: Z3 Build
+      working-directory: ${{runner.workspace}}/vampire/z3/build
+      run: make -j8
+    - name: Create Build Directory
+      run: mkdir build
+    - name: Configure Build
+      working-directory: ${{runner.workspace}}/vampire/build
+      run: cmake .. -DCMAKE_BUILD_TYPE=Release
+      env:
+        CXX: clang++
+    - name: Build
+      working-directory: ${{runner.workspace}}/vampire/build
+      run: make -j8
+    - name: Run Unit Tests
+      working-directory: ${{runner.workspace}}/vampire/build
+      run: ctest --output-on-failure
+    - name: Run Sanity Checks
+      run: checks/sanity build/vampire
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: vampire
+        path: vampire/build/vampire # Change to the actual output binary
+
   release:
-    needs: build
+    needs: 
+        - build 
+        - build-vampire
     runs-on: ubuntu-latest
     permissions:
       contents: write  # Required to push a release
@@ -46,10 +88,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download built artifact
+      - name: Download built eprover artifact
         uses: actions/download-artifact@v4
         with:
           name: eprover
+          path: release
+      - name: Download built vampire artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vampire
           path: release
 
       - name: Create GitHub Release
