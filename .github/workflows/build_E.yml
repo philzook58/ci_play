@@ -17,7 +17,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential cmake  # Add any required dependencies
+          sudo apt install -y build-essential # cmake  # Add any required dependencies
 
       - name: Pull external source (optional)
         run: |
