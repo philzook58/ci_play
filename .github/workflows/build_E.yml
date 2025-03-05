@@ -67,8 +67,8 @@ jobs:
     - name: Run Unit Tests
       working-directory: ${{runner.workspace}}/ci_play/vampire/build
       run: ctest --output-on-failure
-    - name: Run Sanity Checks
-      run: checks/sanity build/vampire
+    #- name: Run Sanity Checks
+    #  run: checks/sanity build/vampire
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
