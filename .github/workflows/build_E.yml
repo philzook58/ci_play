@@ -69,11 +69,13 @@ jobs:
     #  run: ctest --output-on-failure
     #- name: Run Sanity Checks
     #  run: checks/sanity build/vampire
+    - name: Run ls
+      run: ls ${{runner.workspace}}/ci_play/vampire/build
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: vampire
-        path: ci_play/ci_play/vampire/build/vampire # Change to the actual output binary
+        path: ${{runner.workspace}}/ci_play/vampire/build/vampire # Change to the actual output binary
 
   release:
     needs: 
