@@ -58,7 +58,7 @@ jobs:
       run: mkdir vampire/build
     - name: Configure Build
       working-directory: ${{runner.workspace}}/ci_play/vampire/build
-      run: cmake .. -DCMAKE_BUILD_TYPE=Release
+      run: cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=0
       env:
         CXX: clang++
     - name: Build
